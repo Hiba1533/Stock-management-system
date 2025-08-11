@@ -1,0 +1,146 @@
+<!-- templates/view_sale.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-receipt"></i> Sale Order #{{ order.order_id }}</h2>
+            <div>
+                <a href="{{ url_for('generate_invoice_new', order_id=order.order_id) }}" class="btn btn-success">
+                    <i class="bi bi-file-earmark-pdf"></i> Generate Invoice
+                </a>
+                <a href="{{ url_for('sales') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Sales
+                </a>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Order Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Order Date:</strong></div>
+                    <div class="col-md-8">{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Status:</strong></div>
+                    <div class="col-md-8">
+                        <span class="badge bg-{{ 'success' if order.status == 'completed' else 'warning' if order.status == 'pending' else 'danger' }}">
+                            {{ order.status|title }}
+                        </span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Created By:</strong></div>
+                    <div class="col-md-8">{{ order.created_by }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Customer Information</h6>
+            </div>
+            <div class="card-body">
+                {% if order.customer_name %}
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Customer:</strong></div>
+                    <div class="col-md-8">{{ order.customer_name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Email:</strong></div>
+                    <div class="col-md-8">{{ order.customer_email if order.customer_email else '-' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Phone:</strong></div>
+                    <div class="col-md-8">{{ order.customer_phone if order.customer_phone else '-' }}</div>
+                </div>
+                {% else %}
+                <div class="row mb-3">
+                    <div class="col-md-12">Walk-in Customer</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Order Items</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td>{{ item.sku }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                                <td>${{ "%.2f"|format(item.total_price) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                                <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Discount:</strong></td>
+                                <td>${{ "%.2f"|format(order.discount) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Tax:</strong></td>
+                                <td>${{ "%.2f"|format(order.tax) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Grand Total:</strong></td>
+                                <td>${{ "%.2f"|format(order.grand_total) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if order.notes %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Order Notes</h6>
+            </div>
+            <div class="card-body">
+                {{ order.notes }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

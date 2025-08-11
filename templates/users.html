@@ -1,0 +1,182 @@
+<!-- templates/users.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-people-fill"></i> User Management</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-plus"></i> Add User
+            </button>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="userSearch" placeholder="Search users...">
+            <button class="btn btn-outline-secondary" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.full_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if user.role == 'admin' else 'secondary' }}">
+                                        {{ user.role|title }}
+                                    </span>
+                                </td>
+                                <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                            data-bs-target="#editUserModal{{ user.user_id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% if user.user_id != session.user_id %}
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                            data-bs-target="#deleteUserModal{{ user.user_id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Edit User Modal -->
+                            <div class="modal fade" id="editUserModal{{ user.user_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit User</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('edit_user', user_id=user.user_id) }}">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Username</label>
+                                                    <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Full Name</label>
+                                                    <input type="text" class="form-control" name="full_name" value="{{ user.full_name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Role</label>
+                                                    <select class="form-select" name="role" required>
+                                                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                                        <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">New Password (leave blank to keep current)</label>
+                                                    <input type="password" class="form-control" name="password">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete User Modal -->
+                            <div class="modal fade" id="deleteUserModal{{ user.user_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete user "{{ user.username }}"? This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a href="{{ url_for('delete_user', user_id=user.user_id) }}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_user') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="full_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="user" selected>User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

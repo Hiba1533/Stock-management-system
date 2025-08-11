@@ -1,0 +1,162 @@
+<!-- templates/customers.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-people"></i> Customer Management</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                <i class="bi bi-plus"></i> Add Customer
+            </button>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="customerSearch" placeholder="Search customers...">
+            <button class="btn btn-outline-secondary" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="customerTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.name }}</td>
+                                <td>{{ customer.email if customer.email else '-' }}</td>
+                                <td>{{ customer.phone if customer.phone else '-' }}</td>
+                                <td>{{ customer.address if customer.address else '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                            data-bs-target="#editCustomerModal{{ customer.customer_id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% if session.role == 'admin' %}
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                            data-bs-target="#deleteCustomerModal{{ customer.customer_id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Edit Customer Modal -->
+                            <div class="modal fade" id="editCustomerModal{{ customer.customer_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Customer</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('edit_customer', customer_id=customer.customer_id) }}">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Name</label>
+                                                    <input type="text" class="form-control" name="name" value="{{ customer.name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" name="email" value="{{ customer.email }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Phone</label>
+                                                    <input type="text" class="form-control" name="phone" value="{{ customer.phone }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address</label>
+                                                    <textarea class="form-control" name="address" rows="3">{{ customer.address }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Customer Modal -->
+                            <div class="modal fade" id="deleteCustomerModal{{ customer.customer_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete "{{ customer.name }}"? This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a href="{{ url_for('delete_customer', customer_id=customer.customer_id) }}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_customer') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

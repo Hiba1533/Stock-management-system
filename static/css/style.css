@@ -1,0 +1,438 @@
+:root {
+  /* Modern Color Palette */
+  --primary: #3a86ff;
+  --primary-light: #4d9eff;
+  --primary-dark: #2667cc;
+  --secondary: #8338ec;
+  --accent: #ff006e;
+  --success: #06d6a0;
+  --warning: #ffbe0b;
+  --danger: #ef476f;
+  --dark: #1a1a2e;
+  --light: #f8f9fa;
+  --gray: #6c757d;
+
+  /* UI Elements */
+  --sidebar-width: 280px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modern Base Styles */
+body {
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background-color: #f5f7fb;
+  color: #1e293b;
+  line-height: 1.6;
+}
+
+/* Layout Structure */
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+#sidebar {
+  width: var(--sidebar-width);
+  background: #ffffff;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 100;
+  border-right: 1px solid rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+#content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f5f7fb;
+}
+
+/* Modern Sidebar */
+#sidebar .sidebar-header {
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: linear-gradient(180deg, rgba(58,134,255,0.08), transparent);
+}
+
+#sidebar .sidebar-header h3 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--primary);
+  letter-spacing: -0.4px;
+}
+
+/* Top-level list */
+#sidebar ul.components,
+#sidebar ul.list-unstyled {
+  padding: 0.75rem 0 1.25rem;
+  margin: 0;
+  list-style: none;
+}
+
+/* Links */
+#sidebar ul li > a {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  color: #4a5568;
+  text-decoration: none;
+  transition: var(--transition);
+  margin: 0.25rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  position: relative;
+  gap: 10px;
+}
+
+#sidebar ul li > a i {
+  font-size: 1.05rem;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+/* Hover + Active */
+#sidebar ul li > a:hover {
+  background: rgba(58, 134, 255, 0.10);
+  color: var(--primary-dark);
+  transform: translateX(4px);
+}
+
+#sidebar ul li.active > a,
+#sidebar ul li > a.active,
+#sidebar .dropdown-toggle[aria-expanded="true"] {
+  background: rgba(58, 134, 255, 0.14);
+  color: var(--primary-dark);
+  box-shadow: inset 0 0 0 1px rgba(58,134,255,0.15);
+}
+
+/* Caret for dropdowns (uses ::after so no HTML changes) */
+#sidebar a.dropdown-toggle::after {
+  content: '';
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: var(--transition);
+  opacity: .7;
+}
+#sidebar a.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+/* Submenus */
+#sidebar ul.collapse,
+#sidebar ul ul {
+  margin: 0.25rem 0.75rem 0.5rem;
+  padding: 0.35rem 0.25rem 0.5rem;
+  border-left: 2px solid rgba(58,134,255,0.18);
+  border-radius: var(--radius-sm);
+  background: rgba(0,0,0,0.015);
+}
+
+#sidebar ul ul li a {
+  padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+  margin: 0.15rem 0.25rem;
+  font-weight: 500;
+  color: #556176;
+  border-radius: var(--radius-md);
+}
+#sidebar ul ul li a:hover {
+  background: rgba(58, 134, 255, 0.08);
+  color: var(--primary);
+  transform: translateX(3px);
+}
+
+/* Section label (optional, if you add <li class="menu-label">) */
+#sidebar .menu-label {
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #94a3b8;
+}
+
+/* Scrollbar */
+#sidebar::-webkit-scrollbar { width: 10px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 10px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+
+/* Modern Cards */
+.card {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+  background: #ffffff;
+  transition: var(--transition);
+}
+.card:hover {
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+.card-header h6 {
+  font-weight: 700;
+  margin: 0;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+
+/* Modern Tables */
+.table {
+  color: #1e293b;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table th {
+  border-top: none;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.75rem 1.25rem;
+  background: rgba(0,0,0,0.02);
+  color: #64748b;
+}
+.table td {
+  padding: 0.9rem 1.25rem;
+  vertical-align: middle;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+.table tbody tr:hover { background: rgba(0,0,0,0.015); }
+
+/* Modern Buttons */
+.btn {
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.15rem;
+  font-weight: 600;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+}
+.btn i { margin-right: .4rem; }
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(58, 134, 255, 0.22);
+}
+
+/* Modern Forms */
+.form-control {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 0.625rem 1rem;
+  transition: var(--transition);
+  background: #ffffff;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.18);
+  border-color: var(--primary);
+  outline: none;
+}
+
+/* Badges */
+.badge {
+  padding: 0.35rem 0.65rem;
+  font-weight: 700;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  letter-spacing: 0.4px;
+}
+.badge-primary {
+  background-color: rgba(58, 134, 255, 0.12);
+  color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  #content { padding: 1.25rem; }
+}
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin-left: calc(-1 * var(--sidebar-width));
+    height: 100vh;
+  }
+  #sidebar.active { margin-left: 0; }
+  #content { margin-left: 0; padding: 1rem; }
+}
+/* ===== Modern Login Page ===== */
+.login-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(58,134,255,0.07), transparent 65%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(131,56,236,0.07), transparent 65%),
+    #f5f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 5vw, 48px);
+}
+
+/* Layout wrapper if body class isn't available */
+.login-wrapper {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(58,134,255,0.07), transparent 65%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(131,56,236,0.07), transparent 65%),
+    #f5f7fb;
+  padding: clamp(24px, 5vw, 48px);
+}
+
+/* Card */
+.auth-card {
+  width: min(560px, 92vw);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px -20px rgba(0,0,0,0.18),
+    0 6px 20px -10px rgba(0,0,0,0.10);
+  padding: clamp(22px, 4vw, 36px);
+  animation: authFade .28s ease-out both;
+}
+
+/* Title */
+.auth-card .auth-title {
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  text-align: center;
+  letter-spacing: -0.4px;
+  margin-bottom: 18px;
+  color: #1e293b;
+}
+
+/* Subtle divider */
+.auth-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+  margin: 18px 0 8px 0;
+}
+
+/* Input groups */
+.auth-card .form-label {
+  font-weight: 600;
+  color: #516074;
+  margin-bottom: 6px;
+}
+.auth-card .form-control {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  height: 48px;
+  background: #fff;
+  transition: var(--transition);
+  font-size: 0.98rem;
+}
+.auth-card .form-control::placeholder { color: #9aa6b2; }
+.auth-card .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(58,134,255,0.18);
+  outline: none;
+}
+
+/* Button */
+.auth-card .btn-auth {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 700;
+  background: var(--primary);
+  color: #fff;
+  transition: var(--transition);
+  border: none;
+  margin-top: 6px;
+}
+.auth-card .btn-auth:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(58,134,255,0.25);
+}
+.auth-card .btn-auth:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(58,134,255,0.22);
+}
+
+/* Small helper text / version */
+.auth-footnote {
+  text-align: center;
+  color: #7b8794;
+  font-size: 0.92rem;
+  margin-top: 16px;
+}
+
+/* Accessibility: nicer native tooltip hint look on required fields */
+.auth-card input:required:user-invalid {
+  border-color: #ef476f;
+  box-shadow: 0 0 0 4px rgba(239,71,111,0.14);
+}
+/* Sidebar collapse behaviour */
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#content {
+    width: 100%;
+    transition: all 0.3s;
+}
+
+#content.active {
+    margin-left: 0;
+}
+
+/* Animation */
+@keyframes authFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Compact on mobile */
+@media (max-width: 480px) {
+  .auth-card { padding: 18px; border-radius: 14px; }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card, .table { animation: fadeIn 0.25s ease-out forwards; }

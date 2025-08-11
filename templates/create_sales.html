@@ -1,0 +1,223 @@
+<!-- templates/create_sale.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+  <div class="col-md-12">
+    <h2><i class="bi bi-cart-plus"></i> Create New Sale</h2>
+    <hr>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <form id="orderForm" method="POST" action="{{ url_for('create_sale') }}">
+      <!-- Hidden items payload -->
+      <input type="hidden" id="items" name="items">
+
+      <!-- Customer Info -->
+      <div class="card shadow mb-4">
+        <div class="card-header">
+          <h6 class="m-0 font-weight-bold">Customer Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Customer</label>
+              <select class="form-select" name="customer_id" required>
+                <option value="">Select Customer</option>
+                {% for customer in customers %}
+                <option value="{{ customer.customer_id }}">{{ customer.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" name="notes" rows="1" placeholder="Optional"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="card shadow mb-4">
+        <div class="card-header">
+          <h6 class="m-0 font-weight-bold">Order Items</h6>
+        </div>
+        <div class="card-body">
+          <!-- Add item row -->
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="input-group">
+                <select class="form-select" id="productSelect">
+                  <option value="">Select Product</option>
+                  {% for product in products %}
+                  <option value="{{ product.product_id }}"
+                          data-name="{{ product.name }} ({{ product.sku }})"
+                          data-price="{{ (product.unit_price or product.cost_price or 0)|float }}">
+                    {{ product.name }} ({{ product.sku }}) - ${{ (product.unit_price or product.cost_price or 0)|float|round(2) }} - Stock: {{ product.quantity or 0 }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-primary add-item-btn" type="button">
+                  <i class="bi bi-plus"></i> Add Item
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items table -->
+          <div class="table-responsive">
+            <table class="table align-middle" id="itemsTable">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="text-end">Qty</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dynamic rows -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                  <td id="subtotal">$0.00</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Discount:</strong></td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm text-end" id="discount" name="discount" value="0" min="0" step="0.01">
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Tax:</strong></td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm text-end" id="tax" name="tax" value="0" min="0" step="0.01">
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                  <td id="grandTotal">$0.00</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-end mb-4">
+        <a href="{{ url_for('sales') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Complete Sale</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function () {
+  // Selectors that MATCH this template
+  const $productSelect   = $('#productSelect');
+  const $addItemBtn      = $('.add-item-btn');
+  const $tableBody       = $('#itemsTable tbody');
+  const $discount        = $('#discount');
+  const $tax             = $('#tax');
+  const $subtotalCell    = $('#subtotal');
+  const $grandTotalCell  = $('#grandTotal');
+  const $form            = $('#orderForm');
+  const $itemsHidden     = $('#items');
+
+  function num(v){ return parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')) || 0; }
+  function fmt(n){ return (Number(n)||0).toFixed(2); }
+
+  function recalc() {
+    let subtotal = 0;
+    $tableBody.find('.item-total').each(function(){
+      subtotal += num($(this).text());
+    });
+    const discount = num($discount.val());
+    const tax      = num($tax.val());
+    const grand    = subtotal - discount + tax;
+
+    $subtotalCell.text('$' + fmt(subtotal));
+    $grandTotalCell.text('$' + fmt(grand));
+
+    // keep hidden payload in sync
+    const items = [];
+    $tableBody.find('tr[id^="item-"]').each(function(){
+      const id = Number($(this).attr('id').replace('item-',''));
+      const quantity = num($(this).find('.item-qty').val());
+      const price    = num($(this).find('.item-price').text());
+      items.push({ id, quantity, price });
+    });
+    $itemsHidden.val(JSON.stringify(items));
+  }
+
+  function updateItemTotal(pid){
+    const $row = $('#item-' + pid);
+    const qty  = num($row.find('.item-qty').val());
+    const price= num($row.find('.item-price').text());
+    $row.find('.item-total').text(fmt(qty * price));
+    recalc();
+  }
+
+  $addItemBtn.on('click', function(){
+    const $opt = $productSelect.find('option:selected');
+    const pid  = $opt.val();
+    if(!pid){ alert('Please select a product'); return; }
+
+    const name = ($opt.data('name') || $opt.text() || '').trim();
+    const price= num($opt.data('price'));
+    if(!price){ alert('This product has no price.'); return; }
+
+    const $existing = $('#item-' + pid);
+    if($existing.length){
+      const $qty = $existing.find('.item-qty');
+      $qty.val(num($qty.val()) + 1);
+      updateItemTotal(pid);
+    } else {
+      $tableBody.append(`
+        <tr id="item-${pid}">
+          <td>${name}</td>
+          <td style="max-width:110px;">
+            <input type="number" class="form-control form-control-sm item-qty text-end" value="1" min="1">
+          </td>
+          <td class="text-end item-price">${fmt(price)}</td>
+          <td class="text-end item-total">${fmt(price)}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger remove-item" data-id="${pid}">×</button>
+          </td>
+        </tr>
+      `);
+      $('#item-' + pid + ' .item-qty').on('input change', function(){ updateItemTotal(pid); });
+      $('#item-' + pid + ' .remove-item').on('click', function(){ $(this).closest('tr').remove(); recalc(); });
+      recalc();
+    }
+
+    // reset select
+    $productSelect.val('');
+  });
+
+  $discount.on('input change', recalc);
+  $tax.on('input change', recalc);
+
+  $form.on('submit', function(e){
+    const items = JSON.parse($itemsHidden.val() || '[]');
+    if(!items.length){
+      e.preventDefault();
+      alert('Please add at least one item');
+      return;
+    }
+    // allow submit
+  });
+});
+</script>
+{% endblock %}

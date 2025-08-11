@@ -1,0 +1,170 @@
+<!-- templates/suppliers.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-truck"></i> Supplier Management</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                <i class="bi bi-plus"></i> Add Supplier
+            </button>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="supplierSearch" placeholder="Search suppliers...">
+            <button class="btn btn-outline-secondary" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="supplierTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for supplier in suppliers %}
+                            <tr>
+                                <td>{{ supplier.name }}</td>
+                                <td>{{ supplier.contact_person if supplier.contact_person else '-' }}</td>
+                                <td>{{ supplier.email if supplier.email else '-' }}</td>
+                                <td>{{ supplier.phone if supplier.phone else '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                            data-bs-target="#editSupplierModal{{ supplier.supplier_id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% if session.role == 'admin' %}
+                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                            data-bs-target="#deleteSupplierModal{{ supplier.supplier_id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Edit Supplier Modal -->
+                            <div class="modal fade" id="editSupplierModal{{ supplier.supplier_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Supplier</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('edit_supplier', supplier_id=supplier.supplier_id) }}">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Name</label>
+                                                    <input type="text" class="form-control" name="name" value="{{ supplier.name }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Contact Person</label>
+                                                    <input type="text" class="form-control" name="contact_person" value="{{ supplier.contact_person }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" class="form-control" name="email" value="{{ supplier.email }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Phone</label>
+                                                    <input type="text" class="form-control" name="phone" value="{{ supplier.phone }}">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address</label>
+                                                    <textarea class="form-control" name="address" rows="3">{{ supplier.address }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delete Supplier Modal -->
+                            <div class="modal fade" id="deleteSupplierModal{{ supplier.supplier_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete "{{ supplier.name }}"? This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a href="{{ url_for('delete_supplier', supplier_id=supplier.supplier_id) }}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Supplier Modal -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Supplier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_supplier') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" name="contact_person">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Supplier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

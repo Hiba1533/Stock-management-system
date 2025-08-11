@@ -1,0 +1,122 @@
+<!-- templates/inventory.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-clipboard-data"></i> Inventory Management</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Current Inventory</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Current Stock</th>
+                                <th>Min Level</th>
+                                <th>Value</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.sku }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if item.quantity > item.min_stock_level else 'warning' }}">
+                                        {{ item.quantity }}
+                                    </span>
+                                </td>
+                                <td>{{ item.min_stock_level }}</td>
+                                <td>${{ "%.2f"|format(item.inventory_value) }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                            data-bs-target="#adjustInventoryModal{{ item.product_id }}">
+                                        <i class="bi bi-pencil"></i> Adjust
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Adjust Inventory Modal -->
+                            <div class="modal fade" id="adjustInventoryModal{{ item.product_id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Adjust Inventory - {{ item.name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('adjust_inventory') }}">
+                                            <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Current Quantity</label>
+                                                    <input type="number" class="form-control" value="{{ item.quantity }}" disabled>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Adjustment (+/-)</label>
+                                                    <input type="number" class="form-control" name="adjustment" required>
+                                                    <small class="text-muted">Positive number to add stock, negative to remove</small>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notes</label>
+                                                    <textarea class="form-control" name="notes" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Save Adjustment</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="m-0 font-weight-bold">Low Stock Items</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Current</th>
+                                <th>Min</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td class="text-danger">{{ item.quantity }}</td>
+                                <td>{{ item.min_stock_level }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

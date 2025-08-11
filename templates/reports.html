@@ -1,0 +1,116 @@
+<!-- templates/reports.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-graph-up"></i> Reports & Analytics</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Report -->
+    <div class="col-md-12">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Sales Report (Last 12 Months)</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Orders</th>
+                                <th>Revenue</th>
+                                <th>Avg. Order Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in sales_report %}
+                            <tr>
+                                <td>{{ report.month }}</td>
+                                <td>{{ report.orders }}</td>
+                                <td>${{ "%.2f"|format(report.revenue) }}</td>
+                                <td>${{ "%.2f"|format(report.revenue/report.orders) if report.orders > 0 else 0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Inventory Valuation -->
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Inventory Valuation</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory_value %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                                <td>${{ "%.2f"|format(item.value) }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="table-active">
+                                <td colspan="3" class="text-end"><strong>Total Inventory Value:</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_inventory_value) }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Customers -->
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Top Customers</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Orders</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in top_customers %}
+                            <tr>
+                                <td>{{ customer.name }}</td>
+                                <td>{{ customer.orders }}</td>
+                                <td>${{ "%.2f"|format(customer.total_spent) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

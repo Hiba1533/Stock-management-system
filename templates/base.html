@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Stock Management</h3>
+            </div>
+            
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#productSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="bi bi-box-seam"></i> Products
+                    </a>
+                    <ul class="collapse list-unstyled" id="productSubmenu">
+                        <li><a href="{{ url_for('products') }}">Product List</a></li>
+                        <li><a href="{{ url_for('products') }}">Add Product</a></li>
+                        <li><a href="{{ url_for('inventory') }}">Inventory</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#purchaseSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="bi bi-cart-plus"></i> Purchases
+                    </a>
+                    <ul class="collapse list-unstyled" id="purchaseSubmenu">
+                        <li><a href="{{ url_for('purchases') }}">Purchase Orders</a></li>
+                        <li><a href="{{ url_for('create_purchase') }}">New Purchase</a></li>
+                        <li><a href="{{ url_for('suppliers') }}">Suppliers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#salesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="bi bi-cart-check"></i> Sales
+                    </a>
+                    <ul class="collapse list-unstyled" id="salesSubmenu">
+                        <li><a href="{{ url_for('sales') }}">Sales Orders</a></li>
+                        <li><a href="{{ url_for('create_sale') }}">New Sale</a></li>
+                        <li><a href="{{ url_for('customers') }}">Customers</a></li>
+                    </ul>
+                </li>
+                {% if session.role == 'admin' %}
+                <li>
+                    <a href="{{ url_for('users') }}"><i class="bi bi-people"></i> User Management</a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('reports') }}"><i class="bi bi-graph-up"></i> Reports</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-light">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    
+                    <div class="ms-auto d-flex align-items-center">
+                        <span class="navbar-text me-3 text-muted">
+                            Welcome, {{ session.full_name }} ({{ session.role }})
+                        </span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Main Content -->
+            <div class="container-fluid mt-4">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+
+    <script id="modalFlickerGuard">
+  // Prevent anchors that open modals from navigating (the jump causes flicker)
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const toggle = a.getAttribute('data-bs-toggle') || a.getAttribute('data-toggle');
+    if (toggle && toggle.toLowerCase() === 'modal') {
+      e.preventDefault();
+    }
+  }, { passive: false });
+  
+$(document).ready(function () {
+    $('#sidebarCollapse').on('click', function () {
+        $('#sidebar').toggleClass('active');
+        $('#content').toggleClass('active');
+    });
+});
+</script>
+
+</script>
+
+
+</body>
+</html>
