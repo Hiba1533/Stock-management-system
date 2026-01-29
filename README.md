@@ -1,4 +1,4 @@
-﻿Stock_management_system
+#﻿Stock_management_system
 A full-stack inventory management application designed to help businesses track stock movements, monitor low inventory levels, and generate automated reports. This project combines Python backend logic with a web-based frontend for seamless management.
 
 
@@ -26,4 +26,5 @@ Usage
 - Record purchase orders and sales orders.
 - Monitor stock levels and receive low-stock alerts.
 - Generate PDF reports and analyze inventory trends.
+
 
